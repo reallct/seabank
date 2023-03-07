@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.reallct.seabank.mapper.UserMapper">
+
+    <resultMap id="userMap" type="com.reallct.seabank.entity.UserEntity">
+        <id column="USER_ID" property="userId"/>
+        <id column="NAME" property="name"/>
+        <id column="NICK_NAME" property="nickName"/>
+        <id column="PHONE" property="phone"/>
+        <id column="OPENID" property="openid"/>
+        <id column="IMG_URL" property="imgUrl"/>
+        <id column="IS_ADMIN" property="isAdmin"/>
+        <id column="FAMILY_ID" property="familyId"/>
+        <id column="CREATE_USER_ID" property="createUserId"/>
+        <id column="CREATE_TIMESTAMP" property="createTimestamp"/>
+        <id column="MODIFY_USER_ID" property="modifyUserId"/>
+        <id column="MODIFY_TIMESTAMP" property="modifyTimestamp"/>
+
+
+    </resultMap>
+
+
+    <select id="queryByUserId" resultMap="userMap">
+        select * from USER_INFO
+        WHERE USER_ID=#{userId}
+    </select>
+    <select id="queryListByPhone" resultMap="userMap">
+        select * from USER_INFO
+        WHERE PHONE=#{phone}
+        order by USER_ID asc
+        <if test='num!=null and pageSize != null '>
+            limit #{num}, #{pageSize}
+        </if>
+        <if test='num==null and pageSize != null '>
+            limit 0, #{pageSize}
+        </if>
+
+    </select>
+
+    <select id="queryUserNumByPhone" resultType="Integer">
+        select count(1) from USER_INFO WHERE PHONE=#{phone}
+    </select>
+
+
+</mapper>

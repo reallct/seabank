@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.reallct.seabank.mapper.AssetMapper">
+
+    <resultMap id="assetMap" type="com.reallct.seabank.entity.AssetEntity">
+        <id column="ASSET_ID" property="assetId"/>
+        <id column="USER_ID" property="userId"/>
+        <id column="TYPE1" property="type1"/>
+        <id column="TYPE2" property="type2"/>
+        <id column="DETAIL" property="detail"/>
+        <id column="ASSET_AMT" property="assetAmt"/>
+        <id column="NOTE" property="note"/>
+        <id column="CREATE_USER_ID" property="createUserId"/>
+        <id column="CREATE_TIMESTAMP" property="createTimestamp"/>
+        <id column="MODIFY_USER_ID" property="modifyUserId"/>
+        <id column="MODIFY_TIMESTAMP" property="modifyTimestamp"/>
+
+    </resultMap>
+    <resultMap id="assetGroupMap" type="com.reallct.seabank.entity.AssetGroupEntity">
+        <id column="TYPE1" property="type1"/>
+        <id column="TYPE2" property="type2"/>
+        <id column="SUMASSETAMT" property="sumAssetAmt"/>
+        <id column="AMT_COUNT" property="count"/>
+
+
+    </resultMap>
+
+    <insert id="insertAssetStatus">
+        <selectKey resultType="Integer" order="AFTER" keyProperty="assetId" keyColumn="ASSET_ID">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into ASSET_STATUS(
+        USER_ID, TYPE1, TYPE2, DETAIL, ASSET_AMT,NOTE,
+        CREATE_USER_ID, CREATE_TIMESTAMP, MODIFY_USER_ID, MODIFY_TIMESTAMP)
+        values(
+        #{userId},#{type1},#{type2},#{detail}, #{assetAmt},#{note},
+        #{createUserId}, SYSDATE(),#{modifyUserId}, SYSDATE())
+    </insert>
+
+
+    <select id="queryByAssetId" resultMap="assetMap">
+        select * from ASSET_STATUS
+        WHERE ASSET_ID=#{assetId}
+    </select>
+
+
+    <delete id="deleteByAssetId">
+        delete from ASSET_STATUS
+        WHERE ASSET_ID=#{assetId}
+    </delete>
+
+    <update id="updateByAssetId">
+        update ASSET_STATUS set USER_ID=#{userId},
+        TYPE1=#{type1}, TYPE2=#{type2}, DETAIL=#{detail}, ASSET_AMT=#{assetAmt},NOTE=#{note},MODIFY_TIMESTAMP=SYSDATE()
+        WHERE ASSET_ID=#{assetId}
+    </update>
+
+
+    <select id="queryAssetList" resultMap="assetMap">
+        select * from ASSET_STATUS
+        WHERE 1=1
+        <if test="null!=liststr">
+            and USER_ID in (${liststr})
+        </if>
+        <if test="null!=userId and ''!=userId">
+            and USER_ID=#{userId}
+        </if>
+        <if test="null!=type1 and ''!=type1">
+            and TYPE1=#{type1}
+        </if>
+        <if test="null!=type2 and ''!=type2">
+            and TYPE2=#{type2}
+        </if>
+
+        order by ASSET_ID asc
+        <if test='num!=null and pageSize != null '>
+            limit #{num}, #{pageSize}
+        </if>
+        <if test='num==null and pageSize != null '>
+            limit 0, #{pageSize}
+        </if>
+
+    </select>
+
+    <select id="queryAssetListNum" resultType="Integer">
+        select count(1) from ASSET_STATUS
+        WHERE 1=1
+        <if test="null!=liststr">
+            and USER_ID in (${liststr})
+        </if>
+        <if test="null!=userId and ''!=userId">
+            and USER_ID=#{userId}
+        </if>
+        <if test="null!=type1 and ''!=type1">
+            and TYPE1=#{type1}
+        </if>
+        <if test="null!=type2 and ''!=type2">
+            and TYPE2=#{type2}
+        </if>
+
+    </select>
+
+
+
+
+    <select id="queryAssetListGroup" resultMap="assetGroupMap">
+        select TYPE1,TYPE2,SUM(ASSET_AMT) AS SUMASSETAMT,COUNT(1) AS AMT_COUNT from ASSET_STATUS
+        WHERE 1=1
+        <if test="null!=liststr">
+            and USER_ID in (${liststr})
+        </if>
+        <if test="null!=userId and ''!=userId">
+            and USER_ID=#{userId}
+        </if>
+        <if test="null!=type1 and ''!=type1">
+            and TYPE1=#{type1}
+        </if>
+        <if test="null!=type2 and ''!=type2">
+            and TYPE2=#{type2}
+        </if>
+        GROUP BY TYPE1,TYPE2
+        <if test='num!=null and pageSize != null '>
+            limit #{num}, #{pageSize}
+        </if>
+        <if test='num==null and pageSize != null '>
+            limit 0, #{pageSize}
+        </if>
+    </select>
+    <select id="queryAssetListGroupNum" resultType="Integer">
+
+        select count(1) from(
+        select TYPE1,TYPE2,SUM(ASSET_AMT) AS SUMASSETAMT,COUNT(1) AS AMT_COUNT from ASSET_STATUS
+        WHERE 1=1
+        <if test="null!=liststr">
+            and USER_ID in (${liststr})
+        </if>
+        <if test="null!=userId and ''!=userId">
+            and USER_ID=#{userId}
+        </if>
+        <if test="null!=type1 and ''!=type1">
+            and TYPE1=#{type1}
+        </if>
+        <if test="null!=type2 and ''!=type2">
+            and TYPE2=#{type2}
+        </if>
+        GROUP BY TYPE1,TYPE2)t
+    </select>
+</mapper>

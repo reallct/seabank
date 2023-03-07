@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.reallct.seabank.mapper.FamilyMapper">
+
+    <resultMap id="familyMap" type="com.reallct.seabank.entity.FamilyEntity">
+        <id column="FAMILY_ID" property="familyId"/>
+        <id column="FAMILY_NAME" property="familyName"/>
+        <id column="MEMBER_1" property="member1"/>
+        <id column="MEMBER_2" property="member2"/>
+        <id column="MEMBER_3" property="member3"/>
+        <id column="MEMBER_4" property="member4"/>
+        <id column="MEMBER_5" property="member5"/>
+        <id column="CREATE_USER_ID" property="createUserId"/>
+        <id column="CREATE_TIMESTAMP" property="createTimestamp"/>
+        <id column="MODIFY_USER_ID" property="modifyUserId"/>
+        <id column="MODIFY_TIMESTAMP" property="modifyTimestamp"/>
+
+    </resultMap>
+
+
+    <insert id="insertFamilyInfo">
+        <selectKey resultType="Integer" order="AFTER" keyProperty="familyId" keyColumn="FAMILY_ID">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        insert into FAMILY_INFO(
+        FAMILY_ID, FAMILY_NAME, MEMBER_1, MEMBER_2, MEMBER_3, MEMBER_4, MEMBER_5,
+        CREATE_USER_ID, CREATE_TIMESTAMP, MODIFY_USER_ID, MODIFY_TIMESTAMP)
+        values(
+        #{familyId},#{familyName},#{member1},#{member2},#{member3},#{member4},#{member5},
+        #{createUserId}, SYSDATE(),#{modifyUserId}, SYSDATE())
+    </insert>
+
+
+    <select id="queryFamilyInfo" resultMap="familyMap">
+        select * from FAMILY_INFO
+        WHERE FAMILY_ID=#{familyId}
+    </select>
+
+
+    <delete id="deleteFamilyInfo">
+        delete from FAMILY_INFO
+        WHERE FAMILY_ID=#{familyId}
+    </delete>
+
+    <update id="updateFamilyInfo">
+        update FAMILY_INFO set
+        FAMILY_NAME=#{familyName}, MEMBER_1=#{member1}, MEMBER_2=#{member2}, MEMBER_3=#{member3}, MEMBER_4=#{member4},MEMBER_5=#{member5},MODIFY_TIMESTAMP=SYSDATE()
+        WHERE FAMILY_ID=#{familyId}
+    </update>
+
+</mapper>
